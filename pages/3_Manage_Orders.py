@@ -56,15 +56,9 @@ with st.expander("Create New Order", expanded=False):
                     if quantity > stock:
                         st.error(f"Not enough stock. Only {stock} available.")
                     else:
-                        cur.execute(
-                            "INSERT INTO orders (customer_id, status, payment_status, notes) VALUES (%s, %s, %s, %s) RETURNING id;",
-                            (customer_id, status, payment_status, notes.strip() or None)
-                        )
+                        cur.execute("INSERT INTO orders (customer_id, status, payment_status, notes) VALUES (%s, %s, %s, %s) RETURNING id;", (customer_id, status, payment_status, notes.strip() or None))
                         order_id = cur.fetchone()[0]
-                        cur.execute(
-                            "INSERT INTO order_items (order_id, hat_id, quantity, unit_price) VALUES (%s, %s, %s, %s);",
-                            (order_id, hat_id, quantity, unit_price)
-                        )
+                        cur.execute("INSERT INTO order_items (order_id, hat_id, quantity, unit_price) VALUES (%s, %s, %s, %s);", (order_id, hat_id, quantity, unit_price))
                         cur.execute("UPDATE hats SET quantity_in_stock = quantity_in_stock - %s WHERE id=%s;", (quantity, hat_id))
                         conn.commit()
                         cur.close()
@@ -81,20 +75,9 @@ try:
     conn = get_connection()
     cur = conn.cursor()
     if filter_status != "All":
-        cur.execute("""
-            SELECT o.id, c.first_name || ' ' || c.last_name, o.order_date, o.status, o.payment_status
-            FROM orders o
-            JOIN customers c ON c.id = o.customer_id
-            WHERE o.status = %s
-            ORDER BY o.order_date DESC;
-        """, (filter_status,))
+        cur.execute("SELECT o.id, c.first_name || ' ' || c.last_name, o.order_date, o.status, o.payment_status FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.status = %s ORDER BY o.order_date DESC;", (filter_status,))
     else:
-        cur.execute("""
-            SELECT o.id, c.first_name || ' ' || c.last_name, o.order_date, o.status, o.payment_status
-            FROM orders o
-            JOIN customers c ON c.id = o.customer_id
-            ORDER BY o.order_date DESC;
-        """)
+        cur.execute("SELECT o.id, c.first_name || ' ' || c.last_name, o.order_date, o.status, o.payment_status FROM orders o JOIN customers c ON c.id = o.customer_id ORDER BY o.order_date DESC;")
     orders = cur.fetchall()
     cur.close()
     conn.close()
@@ -116,12 +99,7 @@ else:
         if c6.button("Edit", key=f"eo_{oid}"):
             st.session_state["editing_order"] = oid
         if c7.button("Delete", key=f"do_{oid}"):
-            st.session_state[
-
-if c2.button("Cancel", key="no_o"):
-                del st.session_state["confirm_del_order"]
-                st.rerun()
-"confirm_del_order"] = oid
+            st.session_state["confirm_del_order"] = oid
 
     editing_id = st.session_state.get("editing_order")
     if editing_id:
@@ -141,10 +119,7 @@ if c2.button("Cancel", key="no_o"):
                     try:
                         conn = get_connection()
                         cur = conn.cursor()
-                        cur.execute(
-                            "UPDATE orders SET status=%s, payment_status=%s, notes=%s WHERE id=%s;",
-                            (new_status, new_payment, new_notes.strip() or None, editing_id)
-                        )
+                        cur.execute("UPDATE orders SET status=%s, payment_status=%s, notes=%s WHERE id=%s;", (new_status, new_payment, new_notes.strip() or None, editing_id))
                         conn.commit()
                         cur.close()
                         conn.close()
