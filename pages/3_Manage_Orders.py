@@ -121,3 +121,62 @@ else:
 if c2.button("Cancel", key="no_o"):
                 del st.session_state["confirm_del_order"]
                 st.rerun()
+"confirm_del_order"] = oid
+
+    editing_id = st.session_state.get("editing_order")
+    if editing_id:
+        order_data = next((o for o in orders if o[0] == editing_id), None)
+        if order_data:
+            st.divider()
+            st.subheader(f"Edit Order #{editing_id}")
+            with st.form("edit_order"):
+                c1, c2 = st.columns(2)
+                new_status = c1.selectbox("Status *", ORDER_STATUSES, index=ORDER_STATUSES.index(order_data[3]))
+                new_payment = c2.selectbox("Payment Status *", PAYMENT_STATUSES, index=PAYMENT_STATUSES.index(order_data[4]))
+                new_notes = st.text_area("Notes")
+                s, ca = st.columns(2)
+                save = s.form_submit_button("Save Changes")
+                cancel = ca.form_submit_button("Cancel")
+                if save:
+                    try:
+                        conn = get_connection()
+                        cur = conn.cursor()
+                        cur.execute(
+                            "UPDATE orders SET status=%s, payment_status=%s, notes=%s WHERE id=%s;",
+                            (new_status, new_payment, new_notes.strip() or None, editing_id)
+                        )
+                        conn.commit()
+                        cur.close()
+                        conn.close()
+                        del st.session_state["editing_order"]
+                        st.success("Order updated!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                if cancel:
+                    del st.session_state["editing_order"]
+                    st.rerun()
+
+    confirm_id = st.session_state.get("confirm_del_order")
+    if confirm_id:
+        order_data = next((o for o in orders if o[0] == confirm_id), None)
+        if order_data:
+            st.divider()
+            st.warning(f"Delete Order #{confirm_id} for {order_data[1]}? This cannot be undone.")
+            c1, c2 = st.columns(2)
+            if c1.button("Yes, Delete", key="yes_o"):
+                try:
+                    conn = get_connection()
+                    cur = conn.cursor()
+                    cur.execute("DELETE FROM orders WHERE id=%s;", (confirm_id,))
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                    del st.session_state["confirm_del_order"]
+                    st.success("Order deleted.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error: {e}")
+            if c2.button("Cancel", key="no_o"):
+                del st.session_state["confirm_del_order"]
+                st.rerun()
