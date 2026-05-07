@@ -117,3 +117,7 @@ else:
             st.session_state["editing_order"] = oid
         if c7.button("Delete", key=f"do_{oid}"):
             st.session_state[
+
+if c2.button("Cancel", key="no_o"):
+                del st.session_state["confirm_del_order"]
+                st.rerun()
