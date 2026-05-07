@@ -31,3 +31,13 @@ A hat business tracker built to manage orders and inventory for **leodropped**, 
 1. Clone this repository
 2. Install dependencies: `pip install -r requirements.txt`
 3. Create a `.streamlit/secrets.toml` file with your database connection:
+4. Run the app: `streamlit run Home.py`
+
+---
+
+## Pages
+
+- **Home** — Dashboard with live metrics for hat products, customers, total orders, and pending orders
+- **Manage Inventory** — Add, edit, and delete hats with search by style or color
+- **Manage Customers** — Add, edit, and delete customers with search by name or email
+- **Manage Orders** — Create orders, filter by status, and edit or delete existing orders
