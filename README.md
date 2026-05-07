@@ -10,7 +10,8 @@ A hat business tracker built to manage orders and inventory for **leodropped**, 
 
 ## ERD
 
-*(Add erd.png here after exporting from dbdiagram.io)*
+<img width="1260" height="582" alt="Untitled" src="https://github.com/user-attachments/assets/4d123744-b62e-4299-a0d1-36002dc51d95" />
+
 
 ---
 
